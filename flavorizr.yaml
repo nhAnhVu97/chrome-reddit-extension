@@ -1,0 +1,43 @@
+app:
+  android:
+    flavorDimensions: "flavor-type"
+
+flavors:
+  development:
+    app:
+      name: "HiGO Dev"
+    android:
+      applicationId: "dev.higo_apk.com"
+      icon: "assets/launcher/launcher_icon.png"
+      firebase:
+        config: "assets/firebase/development/google-services.json"
+    ios:
+      bundleId: "dev.higo_apk.com"
+      icon: "assets/launcher/launcher_icon.png"
+
+  production:
+    app:
+      name: "Higo Live"
+    android:
+      applicationId: "prod.higo_apk.com"
+      icon: "assets/launcher/launcher_icon.png"
+      firebase:
+        config: "assets/firebase/production/google-services.json"
+    ios:
+      bundleId: "prod.higo_apk.com"
+      icon: "assets/launcher/launcher_icon.png"
+
+ide: vscode
+
+instructions:
+  - assets:download
+  - assets:extract
+  - android:icons
+  - android:androidManifest
+  - android:buildGradle
+  # - ios:xcconfig
+  # - ios:buildTargets
+  # - ios:schema
+  # - ios:icons
+  # - ios:plist
+  - assets:clean

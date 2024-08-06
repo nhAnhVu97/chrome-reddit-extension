@@ -1,0 +1,77 @@
+format:
+  - dart format lib .
+  - dart run import_sorter:main
+  - flutter format lib
+
+build: dart run build_runner build --delete-conflicting-outputs
+
+watch: dart run build_runner watch --delete-conflicting-outputs
+
+gen_assets:
+  - dart run easy_localization:generate -S assets/translations -O lib/generated -f keys -o locale_keys.dart
+
+clean:
+  - flutter clean
+  - flutter pub get
+
+localization: dart run easy_localization:generate -S assets/translations -O lib/generated -f keys -o locale_keys.dart
+
+######################## ANDROID BUILD #########################
+pre_build_android:
+  - rm -Rf build
+  - $clean
+  - dart run build_runner build --delete-conflicting-outputs
+
+build_android_dev:
+  (description): for building Dev Android app
+  (scripts):
+    # - $pre_build_android
+    - flutter build apk --flavor development --release -t lib/main.dart --dart-define-from-file=config.development.json
+    - cd build/app/outputs/apk/development/release && open .
+
+build_android_prod:
+  (description): for building Production Android app
+  (scripts):
+    - $pre_build_android
+    - flutter build appbundle --flavor production --release -t lib/main.dart --dart-define-from-file=config.production.json
+    - cd build/app/outputs/bundle/productionRelease && open .
+
+deploy_dev:
+  (description): for building Dev Android app
+  (scripts):
+    - cd android && fastlane deploy_dev --env development
+
+build_android_apk_prod:
+  (description): for building Production Android app
+  (scripts):
+    - $pre_build_android
+    - flutter build apk --flavor production --release -t lib/main.dart --dart-define-from-file=config.production.json
+    - cd build/app/outputs/flutter-apk && open .
+################################################################
+
+######################## IOS BUILD #########################
+pre_build_ios:
+  - rm -Rf build
+  - $clean
+  - rm -Rf ios/Pods
+  - rm -Rf ios/.symlinks
+  - rm -Rf ios/Flutter/Flutter.framework
+  - rm -Rf ios/Flutter/Flutter.podspec
+  - cd ios
+  - pod install
+  - cd ..
+
+build_ios_dev:
+  (description): for building Development IOS app
+  (scripts):
+    - $pre_build_ios
+    - flutter build ipa --flavor development --release --target lib/main.dart --dart-define-from-file=config.development.json
+    - cd build/ios && open .
+
+build_ios_prod:
+  (description): for building Production IOS app
+  (scripts):
+    - $pre_build_ios
+    - flutter build ipa --flavor production --release --target lib/main.dart --dart-define-from-file=config.production.json
+    - cd build/ios && open .
+################################################################

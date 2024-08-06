@@ -1,0 +1,24 @@
+targets:
+  $default:
+    builders:
+      auto_route_generator:auto_route_generator: # this for @RoutePage
+        generate_for:
+          - lib/modules/**_screen.dart
+      auto_route_generator:auto_router_generator: # this for @AutoRouterConfig
+        generate_for:
+          - lib/core/routes/app_router.dart
+      json_serializable:
+        generate_for:
+          - lib/core/data/models/**.dart
+        options:
+          checked: true
+          explicit_to_json: true
+      freezed:
+        generate_for:
+          - lib/**_cubit.dart
+        options:
+          copy_with: true
+          equal: true
+          to_string_override: true
+          map: false
+          when: false
