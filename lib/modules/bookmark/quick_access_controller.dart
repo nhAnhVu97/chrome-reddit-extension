@@ -17,7 +17,12 @@ class QuickAccessController {
 
   final bookmark = AsyncSignal<List<BookmarkTreeNode>>(AsyncState.loading(), debugLabel: "bookmark");
 
-  final bookmarkTree = computed(() => bookmarks.toList(), debugLabel: 'bookmarkBar');
+  late final bookmarkTree = computed(() {
+    return bookmark.value.maybeMap(
+      data: (value) => value.first.children?.where((el) => el.title == "Bookmarks Bar").toList() ?? <BookmarkTreeNode>[],
+      orElse: () => <BookmarkTreeNode>[],
+    );
+  }, debugLabel: 'bookmarkBar');
 
   late final savedFavoritedList = computed(() {
     return _sharedPref.favorite.value.map((e) => jsonDecode(e) as Map<String, dynamic>).toList();
