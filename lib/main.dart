@@ -1,5 +1,4 @@
 import 'package:chrome_ext/app.dart';
-import 'package:chrome_ext/core/shared/utils/signal_logger.dart';
 import 'package:chrome_ext/injector_setup.dart';
 import 'package:flutter/widgets.dart';
 import 'package:signals/signals_flutter.dart';
