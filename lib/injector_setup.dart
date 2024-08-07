@@ -20,10 +20,10 @@ extension InjectorExtensions on GetIt {
 
   void registerSingletons() {
     registerSingleton<DioProvider>(DioProvider());
-    registerSingletonAsync<SharedPref>(() async {
+    registerSingleton<ApiService>(ApiService(get<DioProvider>().getInstance()));
+    registerSingletonAsync(() async {
       final pref = await SharedPreferences.getInstance();
       return SharedPref(pref);
     });
-    registerSingleton<ApiService>(ApiService(get<DioProvider>().getInstance()));
   }
 }

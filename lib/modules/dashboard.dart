@@ -4,6 +4,7 @@ import 'package:chrome_ext/core/data/network/api_service.dart';
 import 'package:chrome_ext/core/shared/widgets/gap.dart';
 import 'package:chrome_ext/core/shared/widgets/hovering.dart';
 import 'package:chrome_ext/injector_setup.dart';
+import 'package:chrome_ext/modules/bookmark/quick_access.dart';
 import 'package:flutter/material.dart';
 import 'package:signals/signals_flutter.dart';
 import 'package:styled_text/tags/styled_text_tag.dart';
@@ -20,11 +21,11 @@ class Dashboard extends StatefulWidget {
 
 class _DashboardState extends State<Dashboard> {
   final _textCtrl = TextEditingController();
-
   final _isAdding = signal<bool>(false);
-  final _pref = signal(injector<SharedPref>());
 
-  late final _isReachedMax = computed(() => _pref().tags.value.length == 3);
+  late final _isReachedMax = computed(() => _sharedPref.tags.value.length == 3);
+
+  final _sharedPref = injector<SharedPref>();
 
   @override
   Widget build(BuildContext context) {
@@ -44,13 +45,27 @@ class _DashboardState extends State<Dashboard> {
 
               return _addBtn();
             }),
-            _listChip(),
             Expanded(
-              child: Watch((_) {
-                final savedTags = _pref().tags.value;
-                return Row(children: savedTags.map((tag) => Expanded(child: RedditPost(tag: tag))).toList());
-              }),
-            )
+              child: Row(
+                children: [
+                  Container(
+                    constraints: BoxConstraints(maxWidth: MediaQuery.sizeOf(context).width * .7),
+                    child: Column(
+                      children: [
+                        _listChip(),
+                        Expanded(
+                          child: Watch((_) {
+                            final savedTags = _sharedPref.tags.value;
+                            return Row(children: savedTags.map((tag) => Expanded(child: RedditPost(tag: tag))).toList());
+                          }),
+                        )
+                      ],
+                    ),
+                  ),
+                  const Flexible(child: QuickAccess())
+                ],
+              ),
+            ),
           ],
         ),
       ),
@@ -60,7 +75,7 @@ class _DashboardState extends State<Dashboard> {
   Widget _listChip() {
     return Scrollbar(
       child: Watch((context) {
-        final tags = _pref().tags.value;
+        final tags = _sharedPref.tags.value;
         if (tags.isEmpty) return const SizedBox(height: 20);
         return SizedBox(
           height: 70,
@@ -89,9 +104,9 @@ class _DashboardState extends State<Dashboard> {
       deleteIcon: const Icon(Icons.close, size: 18),
       deleteIconBoxConstraints: const BoxConstraints(maxHeight: 24),
       onDeleted: () {
-        final list = List<String>.from(_pref().tags.value);
+        final list = List<String>.from(_sharedPref.tags.value);
         list.removeWhere((e) => e == label);
-        _pref().tags.value = list;
+        _sharedPref.tags.value = list;
       },
     );
   }
@@ -114,8 +129,8 @@ class _DashboardState extends State<Dashboard> {
         const Gap(12),
         IconButton(
           onPressed: () {
-            _pref().tags.value = [
-              ..._pref().tags.value,
+            _sharedPref.tags.value = [
+              ..._sharedPref.tags.value,
               _textCtrl.text,
             ];
             _isAdding.value = false;
@@ -165,7 +180,7 @@ class RedditPost extends StatefulWidget {
 
 class _RedditPostState extends State<RedditPost> {
   final _apiService = injector<ApiService>();
-  final _pref = signal<SharedPref>(injector<SharedPref>());
+  final _sharedPref = injector<SharedPref>();
 
   late FutureSignal<RedditPostResponse> posts;
 
@@ -215,7 +230,7 @@ class _RedditPostState extends State<RedditPost> {
               child: ListView.separated(
                 itemBuilder: (context, index) {
                   final post = list[index];
-                  final savedRead = _pref().readPost.value;
+                  final savedRead = _sharedPref.readPost.value;
                   final isRead = savedRead.contains(post.data?.permalink);
 
                   return Hovering(
@@ -249,8 +264,8 @@ class _RedditPostState extends State<RedditPost> {
                             dense: true,
                             contentPadding: const EdgeInsets.symmetric(horizontal: 16),
                             onTap: () {
-                              _pref().readPost.value = [
-                                ..._pref().readPost.value,
+                              _sharedPref.readPost.value = [
+                                ..._sharedPref.readPost.value,
                                 post.data?.permalink ?? "",
                               ];
                               launchUrlString(

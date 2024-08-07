@@ -12,8 +12,7 @@
         // "development",
         "--dart-define-from-file",
         "config.development.json",
-        "--web-renderer html",
-        "--web-browser-flag=--disable-web-security"
+        "--web-renderer html"
       ]
     },
     {

@@ -10,13 +10,21 @@ class App extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       theme: ThemeData.dark(useMaterial3: true),
-      builder: (context, child) {
-        return Overlay(
-          initialEntries: [
-            OverlayEntry(builder: (context) => const Dashboard()),
-          ],
-        );
-      },
+      home: Builder(
+        builder: (context) {
+          return Overlay(
+            initialEntries: [
+              OverlayEntry(
+                builder: (context) => Builder(
+                  builder: (context) {
+                    return const Dashboard();
+                  },
+                ),
+              ),
+            ],
+          );
+        },
+      ),
     );
   }
 }
